@@ -3,6 +3,9 @@ class Dot {
   float x = 0;
   float y = 0;
   
+  float originX = 0;
+  float originY = 0;
+  
   color dotColor;
   int size = 3;
   
@@ -16,13 +19,15 @@ class Dot {
   Dot(float x, float y, int width, int height) {
     this.x = x;
     this.y = y;
+    this.originX = x;
+    this.originY = y;
     this.width = width;
     this.height = height;
     
   }
   
   void setColor (int red, int green, int blue) {
-    dotColor = color(red, green, blue, 255);
+    dotColor = color(red, green, blue);
   }
   
   void setRandomColor() {
@@ -42,11 +47,7 @@ class Dot {
     if (blue<0) blue=0;
     if (blue>255) blue=255;
 
-    int alpha = (int)(alpha(dotColor)+random(10)-5);
-    if (alpha<128) alpha=128;
-    if (alpha>255) alpha=255;
-
-    dotColor = color(red, green, blue, alpha);
+    dotColor = color(red, green, blue);
   }
   
   void setDirection(float x, float y) {
@@ -65,6 +66,26 @@ class Dot {
     
     x = x+directionX;
     y = y+directionY;
+    
+    // direct back toward origin
+    float increment = 0.05;
+    if (x>originX) {
+      increment = (x-originX)/10000;
+      directionX -= increment;
+    }
+    if (x<originX) {
+      increment = (originX-x)/10000;
+      directionX += increment;
+    }
+    
+    if (y>originY) {
+      increment = (y-originY)/10000;
+      directionY -= increment;
+    }
+    if (y<originY) {
+      increment = (originY-y)/10000;
+      directionY += increment;
+    }
   }
   
   void draw() {
