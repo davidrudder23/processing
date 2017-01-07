@@ -12,7 +12,7 @@ class Dot {
   int width;
   int height;
   
-  float maxDirection = 2.8;
+  float maxDirection = 8;
   float directionX = -1;
   float directionY = -1;
 
@@ -26,28 +26,8 @@ class Dot {
     
   }
   
-  void setColor (int red, int green, int blue) {
-    dotColor = color(red, green, blue);
-  }
-  
-  void setRandomColor() {
-    dotColor = color((int)random(256),(int)random(256),(int)random(256),(int)random(256));
-  }
-  
-  void changeColor() {
-    int red = (int)(red(dotColor)+random(1,10)-5);
-    if (red<0) red=0;
-    if (red>255) red=255;
-    
-    int green = (int)(green(dotColor)+random(1,10)-5);
-    if (green<0) green=0;
-    if (green>255) green=255;
-
-    int blue = (int)(blue(dotColor)+random(1,10)-5);
-    if (blue<0) blue=0;
-    if (blue>255) blue=255;
-
-    dotColor = color(red, green, blue);
+  void setColor (int red, int green, int blue, int alpha) {
+    dotColor = color(red, green, blue, alpha);
   }
   
   void setDirection(float x, float y) {
@@ -68,24 +48,29 @@ class Dot {
     y = y+directionY;
     
     // direct back toward origin
-    float increment = 0.05;
+    float increment;
     if (x>originX) {
-      increment = (x-originX)/10000;
+      increment = (x-originX)/1000;
       directionX -= increment;
     }
     if (x<originX) {
-      increment = (originX-x)/10000;
+      increment = (originX-x)/1000;
       directionX += increment;
     }
     
     if (y>originY) {
-      increment = (y-originY)/10000;
+      increment = (y-originY)/1000;
       directionY -= increment;
     }
     if (y<originY) {
-      increment = (originY-y)/10000;
+      increment = (originY-y)/1000;
       directionY += increment;
     }
+    
+    directionX *=0.99;
+    directionY *=0.99;
+    
+    
   }
   
   void draw() {
@@ -104,8 +89,8 @@ Dot[] dots;
 void setup() {
   size(640, 480);
   
-  PImage img = loadImage("http://www.dsstpublicschools.org/sites/default/files/styles/logo_style/public/school_logos/DSST_byers_FalconsRGB.png");
-  //PImage img = loadImage("http://images6.fanpop.com/image/quiz/964000/964479_1357321295873_50.jpg");
+  //PImage img = loadImage("http://www.dsstpublicschools.org/sites/default/files/styles/logo_style/public/school_logos/DSST_byers_FalconsRGB.png");
+  PImage img = loadImage("http://www.clipartlord.com/wp-content/uploads/2015/03/explosion4.png");
   
   if (img.width>96) img.resize(96,0);
   if (img.height>96) img.resize(0,96);
@@ -123,16 +108,22 @@ void setup() {
       int index = y*img.width+x;
       Dot dot = new Dot(x+offsetX,y+offsetY, width, height);
       dot.setDirection(random(2)-1, random(2)-1);
-      dot.setColor((int)red(img.pixels[index]), (int)green(img.pixels[index]), (int)blue(img.pixels[index]));
+      dot.setColor((int)red(img.pixels[index]), (int)green(img.pixels[index]), (int)blue(img.pixels[index]), (int)alpha(img.pixels[index]));
       dots[index] = dot;
     }
   }
   
-    image(img, offsetX, offsetY);
+  image(img, offsetX, offsetY);
   
 }
 
+boolean firstDraw = true;
 void draw() {
+  if (firstDraw) {
+    delay(1000);
+    firstDraw = false;
+  }
+  
   fill(255,255,255,10);
   rect(0,0,width-1, height-1);
   for (int x = 0; x < dots.length; x++) {
